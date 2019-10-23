@@ -88,6 +88,8 @@ class ValueIterationAgent(ValueEstimationAgent):
         best_action = None
         for action in self.mdp.getPossibleActions(state):
             best_action_value = self.values[(state, action)], best_action = action if self.values[(state, action)] > best_action_value else best_action_value, best_action
+
+        return best_action
       
 
     def getPolicy(self, state):
