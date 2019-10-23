@@ -56,11 +56,11 @@ class ValueIterationAgent(ValueEstimationAgent):
                         else:
                             max_action_value = 0
                             for action_prime in mdp.getPossibleActions(state_prime):
-                            max_action_value = self.values[(state_prime, action_prime)] if self.values[(state_prime, action_prime)] > max_action_value else max_action_value
+                                max_action_value = self.values[(state_prime, action_prime)] if self.values[(state_prime, action_prime)] > max_action_value else max_action_value
 
     def terminalReward(self, state):
-            action = self.mdp.getPossibleActions()[0]
-            self.values[(state, action)] = mdp.getReward(state, None, None)
+        action = self.mdp.getPossibleActions()[0]
+        self.values[(state, action)] = mdp.getReward(state, None, None)
 
     def getValue(self, state):
         """
