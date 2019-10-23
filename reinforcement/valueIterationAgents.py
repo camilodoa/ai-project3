@@ -49,7 +49,8 @@ class ValueIterationAgent(ValueEstimationAgent):
                     self.values[(state, None)] = mdp.getReward(state, None, None)
                 else:
                     for action in mdp.getPossibleActions(state):
-                        state_prime = mdp.getTransitionStatesAndProbs(state, action)[0]
+                        state_prime = mdp.getTransitionStatesAndProbs(state, action)[0][0]
+
                         if mdp.isTerminal(state_prime):
                             max_action_value = mdp.getReward(state_prime, None, None)
                         else:
