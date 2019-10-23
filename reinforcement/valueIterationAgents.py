@@ -47,14 +47,20 @@ class ValueIterationAgent(ValueEstimationAgent):
         for i in range(iterations):
             for state in mdp.getStates():
                 if mdp.isTerminal(state):
-                    action = mdp.getPossibleActions()[0]
-                    self.values[(state, action)] = mdp.getReward(state, None, None)
+                    self.terminalReward(state)
                 else:
                     for action in mdp.getPossibleActions(state):
                         state_prime = mdp.getTransitionStatesAndProbs(state, action)[0]
-                        max_action_value = 0
-                        for action_prime in mdp.getPossibleActions(state_prime):
+                        if mdp.isTerminal(state_prime):
+                            self.terminalReward(state_prime)
+                        else:
+                            max_action_value = 0
+                            for action_prime in mdp.getPossibleActions(state_prime):
                             max_action_value = self.values[(state_prime, action_prime)] if self.values[(state_prime, action_prime)] > max_action_value else max_action_value
+
+    def terminalReward(self, state):
+            action = self.mdp.getPossibleActions()[0]
+            self.values[(state, action)] = mdp.getReward(state, None, None)
 
     def getValue(self, state):
         """
