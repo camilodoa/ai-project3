@@ -45,41 +45,31 @@ class ValueIterationAgent(ValueEstimationAgent):
         iteration_values = util.Counter()
 
         for i in range(iterations):
-            iteration_values = self.values.copy()
             for state in mdp.getStates():
-                if mdp.isTerminal(state):
+          
+                max_action_value = -99999
+                max_action = None
 
-                    iteration_values[state] = mdp.getReward(state, None, None)
-                    print(mdp.getReward(state, 'exit', None))
-                    print(state)
-
-                else:
-                    max_action_value = -99999
+                actions = mdp.getPossibleActions(state)
+                if len(actions) == 0:
+                    max_action_value = mdp.getReward(state, None, None)
                     max_action = None
-
-                    actions = mdp.getPossibleActions(state)
-                    if len(actions) == 0:
-                        max_action_value = mdp.getReward(state, None, None)
-                        print(max_action_value)
-                        max_action = None
-                        max_state_prime = None
-                    else:
-                        for action in actions:
-                            summation = 0
-                            max_state_prime = None
-                            max_state_prime_value = -99999
-                            for state_prime, prob in mdp.getTransitionStatesAndProbs(state, action):
+                    max_state_prime = None
+                else:
+                    for action in actions:
+                        summation = 0
+                        for state_prime, prob in mdp.getTransitionStatesAndProbs(state, action):
+                            if mdp.isTerminal(state_prime):
+                                iteration_values[state] = mdp.getReward(state, 'exit', 'TERMINAL_STATE')
+                            else:
                                 utility = self.values[state_prime]
                                 summation += utility*prob
 
-                                if utility > max_state_prime_value:
-                                    max_state_prime = state_prime
+                        if summation > max_action_value:
+                            max_action_value = summation
+                            max_action = action
 
-                            if summation > max_action_value:
-                                max_action_value = summation
-                                max_action = max_action_value
-
-                    iteration_values[state] = mdp.getReward(state, None, None) + discount*max_action_value
+                iteration_values[state] = mdp.getReward(state, None, None) + discount*max_action_value
             # Update at the end of each iteration
             self.values = iteration_values.copy()
 
@@ -96,11 +86,13 @@ class ValueIterationAgent(ValueEstimationAgent):
           Compute the Q-value of action in state from the
           value function stored in self.values.
         """
-        print((state, action))
-        sum = 0
+        q = 0
         for state_prime, prob in self.mdp.getTransitionStatesAndProbs(state, action):
-            sum += prob*self.values[state_prime]
-        return sum
+            if self.mdp.isTerminal(state_prime):
+                q += prob*self.mdp.getReward(state, 'exit', 'TERMINAL_STATE')
+            else:
+                q += prob*self.values[state_prime]*self.discount
+        return q
 
     def computeActionFromValues(self, state):
         """
@@ -115,9 +107,9 @@ class ValueIterationAgent(ValueEstimationAgent):
         max_action_value = -9999
 
         for action in self.mdp.getPossibleActions(state):
-            state_prime = self.mdp.getTransitionStatesAndProbs(state, action)[0][0]
-            if self.values[state_prime] > max_action_value:
-                max_action_value = self.values[state_prime]
+            q = self.computeQValueFromValues(state, action)
+            if q > max_action_value:
+                max_action_value = q
                 best_action = action
 
         return best_action
