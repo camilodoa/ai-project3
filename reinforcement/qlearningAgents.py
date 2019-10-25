@@ -63,7 +63,7 @@ class QLearningAgent(ReinforcementAgent):
           terminal state, you should return a value of 0.0.
         """
 
-        return 0 if len(self.getLegalActions(state)) == 0 else max([self.qValues[(state, action)] for action in self.getLegalActions(state)])
+        return 0 if len(self.getLegalActions(state)) == 0 else max([self.getQValue(state, action) for action in self.getLegalActions(state)])
 
         util.raiseNotDefined()
 
@@ -74,7 +74,7 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
 
-        return None if len(self.getLegalActions(state)) == 0 else max([ (self.qValues[(state, action)], action) for action in self.getLegalActions(state)], key=lambda x : x[0])[1]
+        return None if len(self.getLegalActions(state)) == 0 else max([ (self.getQValue(state, action), action) for action in self.getLegalActions(state)], key=lambda x : x[0])[1]
 
         util.raiseNotDefined()
 
@@ -108,7 +108,7 @@ class QLearningAgent(ReinforcementAgent):
           NOTE: You should never call this function,
           it will be called on your behalf
         """
-        self.qValues[state, action] = self.qValues[state, action] + self.alpha*(reward + self.discount*self.computeValueFromQValues(nextState) - self.qValues[state, action])
+        self.qValues[state, action] = self.getQValue(state, action) + self.alpha*(reward + self.discount*self.computeValueFromQValues(nextState) - self.getQValue(state, action))
         return
         util.raiseNotDefined()
 
@@ -172,14 +172,18 @@ class ApproximateQAgent(PacmanQAgent):
           Should return Q(state,action) = w * featureVector
           where * is the dotProduct operator
         """
-        "*** YOUR CODE HERE ***"
+        return self.featExtractor.getFeatures(state, action).__mul__(self.weights)
         util.raiseNotDefined()
 
     def update(self, state, action, nextState, reward):
         """
            Should update your weights based on transition
         """
-        "*** YOUR CODE HERE ***"
+        difference = reward + self.discount*self.computeValueFromQValues(nextState) - self.getQValue(state, action)
+        
+        for feature in self.featExtractor.getFeatures(state, action).sortedKeys():
+            self.weights[feature] += self.alpha*difference*self.featExtractor.getFeatures(state, action)[feature]
+        return
         util.raiseNotDefined()
 
     def final(self, state):
@@ -190,5 +194,6 @@ class ApproximateQAgent(PacmanQAgent):
         # did we finish training?
         if self.episodesSoFar == self.numTraining:
             # you might want to print your weights here for debugging
+            print(self.weights)
             "*** YOUR CODE HERE ***"
             pass
