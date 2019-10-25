@@ -55,15 +55,16 @@ def question3d():
 def question3e():
     answerDiscount = 0
     answerNoise = 0
-    answerLivingReward = 100 
+    answerLivingReward = 100
     return answerDiscount, answerNoise, answerLivingReward
     # If not possible, return 'NOT POSSIBLE'
 
 def question6():
-    answerEpsilon = None
-    answerLearningRate = None
-    return answerEpsilon, answerLearningRate
+    answerEpsilon = 0.999
+    answerLearningRate = 0.01
+    # return answerEpsilon, answerLearningRate
     # If not possible, return 'NOT POSSIBLE'
+    return 'NOT POSSIBLE'
 
 if __name__ == '__main__':
     print 'Answers to analysis questions:'
