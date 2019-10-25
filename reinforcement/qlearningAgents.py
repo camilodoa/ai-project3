@@ -62,8 +62,9 @@ class QLearningAgent(ReinforcementAgent):
           there are no legal actions, which is the case at the
           terminal state, you should return a value of 0.0.
         """
-        return max([self.qValues[(state, action)] for action in self.getLegalActions(state)])
-        
+
+        return 0 if len(self.getLegalActions(state)) == 0 else max([self.qValues[(state, action)] for action in self.getLegalActions(state)])
+
         util.raiseNotDefined()
 
     def computeActionFromQValues(self, state):
@@ -73,7 +74,7 @@ class QLearningAgent(ReinforcementAgent):
           you should return None.
         """
 
-        return max([ (self.qValues[(state, action)], action) for action in self.getLegalActions(state)], key=lambda x : x[0])[1]
+        return None if len(self.getLegalActions(state)) == 0 else max([ (self.qValues[(state, action)], action) for action in self.getLegalActions(state)], key=lambda x : x[0])[1]
 
         util.raiseNotDefined()
 
@@ -105,7 +106,8 @@ class QLearningAgent(ReinforcementAgent):
           NOTE: You should never call this function,
           it will be called on your behalf
         """
-        "*** YOUR CODE HERE ***"
+        self.qValues[state, action] = self.qValues[state, action] + self.alpha*(reward + self.discount*self.computeValueFromQValues(nextState) - self.qValues[state, action])
+        return
         util.raiseNotDefined()
 
     def getPolicy(self, state):
